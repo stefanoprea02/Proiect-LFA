@@ -59,13 +59,17 @@ def nfa_parser_engine(*text_file):
                             else:
                                 starting_state = int(l[0][1])
                 elif(reading_transitions == 1):
+                    linie = linie.replace(',', ' ')
+                    linie = linie.replace(',', ' ')
                     l = linie.split()
-                    l.remove(',')
                     if(l[0] in states and l[1][0] in sigma and l[2] in states):
                         coloana = int(l[0][1])
                         linie = int(l[2][1])
                         list = [l[1][0]]
-                        transitions[coloana - 1][linie - 1] = list
+                        if transitions[coloana - 1][linie - 1]:
+                            transitions[coloana - 1][linie - 1].append(l[1][0])
+                        else:
+                            transitions[coloana - 1][linie - 1] = [l[1][0]]
                     else:
                         valid = 0
                         return sigma, states, transitions, starting_state, final_states, valid
