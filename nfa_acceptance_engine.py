@@ -1,7 +1,7 @@
 import nfa_parser_engine
 import sys
 
-if(sys.argv[0] == "dfa_acceptance_engine.py"):
+if(sys.argv[0] == "nfa_acceptance_engine.py"):
     if len(sys.argv) <= 2:
         print("Not enough arguments")
         exit()
@@ -15,18 +15,22 @@ if(sys.argv[0] == "dfa_acceptance_engine.py"):
 def cautare(count, current_state, max_size):
     gasit = False
     acceptat = False
-    for j in range(0, len(transitions[current_state - 1])):
-        if(transitions[current_state - 1][j] and nfa[count] in transitions[current_state - 1][j]):
-            if count == max_size - 1:
-                current_state2 = j + 1
-                for x in final_states:
-                    if current_state2 == x:
-                        acceptat = True
-                        break
-                if acceptat == True:
-                    return True
-            else:
-                gasit = cautare(count + 1, j + 1, max_size)
+
+    #cautam daca exista un nod care pleaca din nodul curent prin valoare din string
+    #daca da verificam daca am ajuns la finalul string-ului
+    #ca sa verificam daca nodul se afla in nodurile finale
+    #daca nu am ajuns la final trecem la urmatorul nod prin apelarea functiei
+
+    if transitions[current_state][nfa[count]]:
+        if count == max_size - 1:
+            for state in transitions[current_state][nfa[count]]:
+                if state in final_states:
+                    acceptat = True
+                    break
+            return acceptat
+        else:
+            for state in transitions[current_state][nfa[count]]:
+                gasit = cautare(count + 1, state, max_size)
                 if gasit == True:
                     return True
     return gasit

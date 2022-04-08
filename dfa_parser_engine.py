@@ -11,10 +11,13 @@ if(sys.argv[0] == "dfa_parser_engine.py"):
         exit()
 
 def dfa_parser_engine(*text_file):
+
+    # initializam valorile din dfa
+
     sigma = []
     states = []
     final_states = []
-    transitions = []
+    transitions = {}
     if(text_file):
         file = open(text_file[0], 'r')
     else:
@@ -25,6 +28,9 @@ def dfa_parser_engine(*text_file):
     reading_transitions = 0
     starting_state = None
     valid = 1
+
+    #citim linie cu linie
+
     for linie in linii:
         if(linie != '#'):
             if(linie == "Sigma:\n"):
@@ -32,12 +38,15 @@ def dfa_parser_engine(*text_file):
             elif(linie == "States:\n"):
                 reading_states = 1
             elif(linie == "Transitions:\n"):
+
+                # facem un dictionar pentru fiecare nod
+
                 reading_transitions = 1
                 for i in range(0, len(states)):
-                    linie_none = []
-                    for i in range(0, len(states)):
-                        linie_none.append(None)
-                    transitions.append(linie_none)
+                    dict = {}
+                    for j in range(0, len(sigma)):
+                        dict[sigma[j]] = None
+                    transitions[states[i]] = dict
             elif(linie == "End\n" or linie == "End"):
                 reading_sigma = 0
                 reading_states = 0
@@ -51,25 +60,23 @@ def dfa_parser_engine(*text_file):
                     states.append(l[0])
                     if(len(l) > 1):
                         if('F' in l):
-                            final_states.append(int(l[0][1]))
+                            final_states.append(l[0])
                         if('S' in l):
                             if (starting_state != None):
                                 valid = 0
                                 return sigma, states, transitions, starting_state, final_states, valid
                             else:
-                                starting_state = int(l[0][1])
+                                starting_state = l[0]
                 elif(reading_transitions == 1):
                     linie = linie.replace(',', ' ')
                     linie = linie.replace(',', ' ')
                     l = linie.split()
-                    if(l[0] in states and l[1][0] in sigma and l[2] in states):
-                        coloana = int(l[0][1])
-                        linie = int(l[2][1])
-                        if(transitions[coloana - 1][linie - 1] != None):
+                    if(l[0] in states and l[1] in sigma and l[2] in states):
+                        if transitions[l[0]][l[1]]:
                             valid = 0
                             return sigma, states, transitions, starting_state, final_states, valid
                         else:
-                            transitions[coloana - 1][linie - 1] = l[1][0]
+                            transitions[l[0]][l[1]] = [l[2]]
                     else:
                         valid = 0
                         return sigma, states, transitions, starting_state, final_states, valid

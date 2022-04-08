@@ -15,20 +15,22 @@ if sys.argv[0] == "dfa_acceptance_engine.py":
 sigma, states, transitions, starting_state, final_states, valid = dfa_parser_engine.dfa_parser_engine("dfa_config_file.txt")
 if valid == 1:
     string = sys.argv[2]
-    dfa = []
-    for letter in string:
-        dfa.append(letter)
+    dfa = tuple(string)
     current_state = starting_state
+
+    #trecem prin fiecare litera din string si cautam daca nodul curent poate trece la alt nod prin acea litera
+
     for i in range(0, len(dfa)):
         gasit = False
-        for j in range(0, len(transitions[current_state - 1])):
-            if dfa[i] == transitions[current_state - 1][j]:
-                current_state = j + 1
-                gasit = True
-                break
-        if gasit == False:
+        if transitions[current_state][dfa[i]]:
+            current_state = transitions[current_state][dfa[i]][0]
+            gasit = True
+        else:
             break
     accepted = False
+
+    #verificam daca nodul la care am ajuns este un nod final
+
     if gasit == True:
         for x in final_states:
             if current_state == x:

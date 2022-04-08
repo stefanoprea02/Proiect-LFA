@@ -15,22 +15,34 @@ if(sys.argv[0] == "e_nfa_acceptance_engine.py"):
 def cautare(count, current_state, max_size):
     gasit = False
     acceptat = False
-    for j in range(0, len(transitions[current_state - 1])):
-        if(transitions[current_state - 1][j] and 'e' in transitions[current_state - 1][j]):
-            gasit = cautare(count, j + 1, max_size)
+
+    #verificam daca nodul curent poate trece la alte noduri prin e, daca da trecem la acel nod prin apelul functie
+
+    if transitions[current_state]['e']:
+        if count == max_size - 1:
+            for state in transitions[current_state]['e']:
+                if state in final_states:
+                    acceptat = True
+                    return acceptat
+                    break
+        for state in transitions[current_state]['e']:
+            gasit = cautare(count, state, max_size)
             if gasit == True:
                 return True
-        if(transitions[current_state - 1][j] and nfa[count] in transitions[current_state - 1][j]):
-            if count == max_size - 1:
-                current_state2 = j + 1
-                for x in final_states:
-                    if current_state2 == x:
-                        acceptat = True
-                        break
-                if acceptat == True:
-                    return True
-            else:
-                gasit = cautare(count + 1, j + 1, max_size)
+
+    #verificam daca putem trece la alt nod prin litera din string la care am ajuns
+    #daca da trecem la ea, iar daca nu returnam fals
+
+    if transitions[current_state][nfa[count]]:
+        if count == max_size - 1:
+            for state in transitions[current_state][nfa[count]]:
+                if state in final_states:
+                    acceptat = True
+                    break
+            return acceptat
+        else:
+            for state in transitions[current_state][nfa[count]]:
+                gasit = cautare(count + 1, state, max_size)
                 if gasit == True:
                     return True
     return gasit
