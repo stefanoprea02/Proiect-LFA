@@ -51,7 +51,12 @@ def functie(dfa_transitions, state):
                                     dfa_transitions[state][litera] = {}
                                     dfa_transitions[state][litera] = transitions[state][litera]
 
-def afisare():
+def afisare(*t):
+    sigma = t[0]
+    dfa_states = t[1]
+    dfa_transitions = t[2]
+    dfa_starting_state = t[3]
+    dfa_final_states = t[4]
     print("#")
     print("#")
     print("#")
@@ -85,68 +90,69 @@ def afisare():
     print("#")
     print("#")
 
-sigma, states, transitions, starting_state, final_states, valid = nfa_parser_engine.nfa_parser_engine("nfa_config_file.txt")
-if valid == 1:
+if(sys.argv[0] == "nfa_conversion_engine.py"):
+    sigma, states, transitions, starting_state, final_states, valid = nfa_parser_engine.nfa_parser_engine("nfa_config_file.txt")
+    if valid == 1:
 
-    # initializam valorile noului dfa
+        # initializam valorile noului dfa
 
-    dfa_sigma = sigma
-    dfa_starting_state = starting_state
-    dfa_final_states = set()
-    dfa_states = set()
-    dfa_states.update([states[0]])
-    dfa_transitions = {}
-    dfa_transitions[states[0]] = transitions[states[0]]
+        dfa_sigma = sigma
+        dfa_starting_state = starting_state
+        dfa_final_states = set()
+        dfa_states = set()
+        dfa_states.update([states[0]])
+        dfa_transitions = {}
+        dfa_transitions[states[0]] = transitions[states[0]]
 
-    state = states[0]
-    for litera in sigma:
-        if transitions[state][litera]:
-            list = transitions[state][litera]
-        dfa_states.update(['-'.join(list)])
-
-        #vedem daca nodul curent merge in mai multe noduri
-
-        if len(list) > 1:
-
-            #daca da atunci creem un nou nod care contine toate nodurile in care nodul curent merge
-
-            newState = "-".join(list)
-            dfa_transitions[newState] = {}
-            functie(dfa_transitions, newState)
-        elif len(list) == 1:
-
-            #daca nu copiem nodul in care merge nodul curent si il punem in dfa_transitions
-
-            dfa_transitions[list[0]] = {}
-            dfa_transitions[list[0]][litera] = transitions[list[0]][litera]
-            functie(dfa_transitions, list[0])
-
-    #cautam toate nodurile formate din mai multe noduri care contin un nod final
-
-    for state in dfa_transitions:
+        state = states[0]
         for litera in sigma:
-            list = dfa_transitions[state][litera]
-            final_state_in_list = False
-            for final_state in final_states:
-                if list and final_state in list:
-                    final_state_in_list = True
-                else:
-                    if list:
-                        pass
+            if transitions[state][litera]:
+                list = transitions[state][litera]
+            dfa_states.update(['-'.join(list)])
+
+            #vedem daca nodul curent merge in mai multe noduri
+
+            if len(list) > 1:
+
+                #daca da atunci creem un nou nod care contine toate nodurile in care nodul curent merge
+
+                newState = "-".join(list)
+                dfa_transitions[newState] = {}
+                functie(dfa_transitions, newState)
+            elif len(list) == 1:
+
+                #daca nu copiem nodul in care merge nodul curent si il punem in dfa_transitions
+
+                dfa_transitions[list[0]] = {}
+                dfa_transitions[list[0]][litera] = transitions[list[0]][litera]
+                functie(dfa_transitions, list[0])
+
+        #cautam toate nodurile formate din mai multe noduri care contin un nod final
+
+        for state in dfa_transitions:
+            for litera in sigma:
+                list = dfa_transitions[state][litera]
+                final_state_in_list = False
+                for final_state in final_states:
+                    if list and final_state in list:
+                        final_state_in_list = True
                     else:
-                        dfa_transitions[state].pop(litera)
-            if final_state_in_list == True:
-                dfa_final_states.update(["-".join(list)])
+                        if list:
+                            pass
+                        else:
+                            dfa_transitions[state].pop(litera)
+                if final_state_in_list == True:
+                    dfa_final_states.update(["-".join(list)])
 
-    while "" in dfa_states:
-        dfa_states.remove("")
+        while "" in dfa_states:
+            dfa_states.remove("")
 
-    for state in dfa_transitions:
-        for litera in sigma:
-            if litera in dfa_transitions[state]:
-                dfa_transitions[state][litera] = ['-'.join(dfa_transitions[state][litera])]
+        for state in dfa_transitions:
+            for litera in sigma:
+                if litera in dfa_transitions[state]:
+                    dfa_transitions[state][litera] = ['-'.join(dfa_transitions[state][litera])]
 
-    dfa_states = sorted(dfa_states, key=lambda x: x[1])
-    afisare()
-else:
-    print("Input is not valid")
+        dfa_states = sorted(dfa_states, key=lambda x: x[1])
+        afisare(dfa_sigma, dfa_states, dfa_transitions, dfa_starting_state, dfa_final_states)
+    else:
+        print("Input is not valid")
