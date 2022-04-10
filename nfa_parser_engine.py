@@ -46,6 +46,7 @@ def nfa_parser_engine(*text_file):
                     dict = {}
                     for j in range(0, len(sigma)):
                         dict[sigma[j]] = None
+                    dict['*'] = None
                     transitions[states[i]] = dict
             elif(linie == "End\n" or linie == "End"):
                 reading_sigma = 0
@@ -71,7 +72,7 @@ def nfa_parser_engine(*text_file):
                     linie = linie.replace(',', ' ')
                     linie = linie.replace(',', ' ')
                     l = linie.split()
-                    if(l[0] in states and l[1] in sigma and l[2] in states):
+                    if(l[0] in states and (l[1] in sigma or l[1] == '*') and l[2] in states):
                         if transitions[l[0]][l[1]]:
                             transitions[l[0]][l[1]].append(l[2])
                         else:
